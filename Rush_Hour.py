@@ -2,6 +2,7 @@ import tkinter as tk
 from collections import deque
 import copy
 import random
+import heapq
 
 # ===================== LOGIC =====================
 
@@ -73,6 +74,35 @@ def bfs_solver(initial_state):
             if key not in visited:
                 visited.add(key)
                 queue.append((next_state, path + [current_state]))
+    return None
+
+def ucs_solver(initial_state):
+    visited = {}
+    heap = []
+    counter = 0  # Add counter to break ties
+    # (total_cost, counter, path, state)
+    heapq.heappush(heap, (0, counter, [], initial_state))
+    visited[state_key(initial_state)] = 0
+    counter += 1
+    
+    while heap:
+        cost, _, path, current_state = heapq.heappop(heap)
+        if is_goal(current_state):
+            return path + [current_state]
+        for next_state in generate_moves(current_state):
+            # Find which vehicle moved
+            for name in current_state:
+                if current_state[name][:2] != next_state[name][:2]:
+                    move_cost = current_state[name][2]  # length of vehicle
+                    break
+            else:
+                move_cost = 0
+            next_cost = cost + move_cost
+            key = state_key(next_state)
+            if key not in visited or next_cost < visited[key]:
+                visited[key] = next_cost
+                heapq.heappush(heap, (next_cost, counter, path + [current_state], next_state))
+                counter += 1
     return None
 
 # ===================== MAPS =====================
@@ -163,7 +193,8 @@ is_playing = False
 def load_new_map():
     global initial_state, solution, step_index
     initial_state = random.choice(maps)
-    solution = bfs_solver(initial_state)
+    # solution = bfs_solver(initial_state)
+    solution = ucs_solver(initial_state)
     step_index = 0
 
 # def draw_board():
