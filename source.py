@@ -1,12 +1,34 @@
 import tkinter as tk
+from tkinter import messagebox
 from collections import deque
 import copy
 import random
 import heapq
+# # from PIL import Image, ImageTk
 
+# CELL_SIZE = 80
+# BOARD_SIZE = 6
+# # ===================== LOAD IMAGES ====================
+# # def load_images():
+# #     imgs = {}
+# #     for name in ['X','A','B','C','D','E','F','G']:
+# #         for o in ['H','V']:
+# #             fname = f"{name}_{o}.png"
+# #             path = os.path.join("images", fname)
+# #             if os.path.exists(path):
+# #                 # Xác định chiều dài: xe C giả định dài 3; tùy map
+# #                 length = 3 if name in ['C','E'] else 2
+# #                 w = CELL_SIZE * length if o=='H' else CELL_SIZE
+# #                 h = CELL_SIZE if o=='H' else CELL_SIZE * length
+# #                 img = Image.open(path).resize((w,h), Image.ANTIALIAS)
+# #                 # img = Image.open(path).resize((w, h), Image.Resampling.LANCZOS)
+
+# #                 imgs[f"{name}_{o}"] = ImageTk.PhotoImage(img)
+# #     return imgs
+
+# # images = {}
 # ===================== LOGIC =====================
 
-# tạo cái bảng
 def create_board(state):
     board = [['.' for _ in range(6)] for _ in range(6)]
     for name, (row, col, length, orient) in state.items():
@@ -105,6 +127,7 @@ def ucs_solver(initial_state):
                 counter += 1
     return None
 
+
 # ===================== MAPS =====================
 
 maps = [
@@ -168,11 +191,26 @@ maps = [
         'X': (2, 0, 2, 'H'),
         'A': (0, 0, 2, 'V'),
         'B': (0, 1, 2, 'V'),
-        'C': (0, 3, 3, 'V'),
-        'D': (0, 5, 3, 'V'),
-        'E': (3, 0, 2, 'H'),
-        'F': (4, 2, 2, 'H'),
-        'G': (5, 4, 2, 'H')
+        'C': (0, 2, 3, 'V'),
+        'D': (3, 0, 3, 'H'),
+        'E': (4, 3, 2, 'H')
+    },
+    {
+        'X': (2, 2, 2, 'H'),
+        'A': (0, 0, 3, 'V'),
+        'B': (0, 3, 2, 'V'),
+        'C': (0, 5, 3, 'V'),
+        'D': (3, 2, 3, 'H'),
+        'E': (5, 2, 3, 'H')
+    },
+    {
+        'X': (2, 1, 2, 'H'),
+        'A': (0, 0, 3, 'V'),
+        'B': (0, 3, 2, 'V'),
+        'C': (0, 5, 3, 'V'),
+        'D': (3, 0, 3, 'H'),
+        'E': (3, 3, 3, 'H'),
+        'F': (5, 2, 2, 'H')
     }
 ]
 
@@ -189,44 +227,24 @@ initial_state = {}
 solution = []
 step_index = 0
 is_playing = False
+has_solution = True
 
 def load_new_map():
-    global initial_state, solution, step_index
+    global initial_state, solution, step_index, has_solution
     initial_state = random.choice(maps)
-    # solution = bfs_solver(initial_state)
-    solution = ucs_solver(initial_state)
+    result = bfs_solver(initial_state)
+    if result is None:
+        solution = [initial_state]
+        has_solution = False
+    else:
+        solution = result
+        has_solution = True
     step_index = 0
-
-# def draw_board():
-#     global canvas, solution, step_index, info_label
-#     canvas.delete("all")
-#     for r in range(BOARD_SIZE):
-#         for c in range(BOARD_SIZE):
-#             x0 = c * CELL_SIZE
-#             y0 = r * CELL_SIZE
-#             x1 = x0 + CELL_SIZE
-#             y1 = y0 + CELL_SIZE
-#             canvas.create_rectangle(x0, y0, x1, y1, fill="white", outline="black")
-
-#     if solution:
-#         state = solution[step_index]
-#         for name, (row, col, length, orient) in state.items():
-#             x0 = col * CELL_SIZE
-#             y0 = row * CELL_SIZE
-#             x1 = (col + length) * CELL_SIZE if orient == 'H' else x0 + CELL_SIZE
-#             y1 = y0 + CELL_SIZE if orient == 'H' else (row + length) * CELL_SIZE
-#             canvas.create_rectangle(x0, y0, x1, y1, fill=COLORS.get(name, "gray"), outline="black", width=2)
-#             canvas.create_text((x0 + x1) // 2, (y0 + y1) // 2, text=name, font=("Arial", 20, "bold"))
-#         total_cost = step_index
-#         info_label.config(text=f"Step {step_index}/{len(solution)-1}    Total cost: {total_cost}")
-#     else:
-#         info_label.config(text="No solution found.")
 
 def draw_board():
     global canvas, solution, step_index, info_label
     canvas.delete("all")
 
-    # Vẽ lưới nền trắng
     for r in range(BOARD_SIZE):
         for c in range(BOARD_SIZE):
             x0 = c * CELL_SIZE
@@ -240,42 +258,29 @@ def draw_board():
         for name, (row, col, length, orient) in state.items():
             x0 = col * CELL_SIZE
             y0 = row * CELL_SIZE
-            if orient == 'H':
-                x1 = (col + length) * CELL_SIZE
-                y1 = y0 + CELL_SIZE
-            else:
-                x1 = x0 + CELL_SIZE
-                y1 = (row + length) * CELL_SIZE
+            x1 = (col + length) * CELL_SIZE if orient == 'H' else x0 + CELL_SIZE
+            y1 = y0 + CELL_SIZE if orient == 'H' else (row + length) * CELL_SIZE
 
             color = COLORS.get(name, "gray")
 
-            # Vẽ thân xe (thường chỉ bo nếu xe ngắn)
             if length == 2:
-                # Xe ngắn: vẽ bo đầu + đuôi bằng arc
                 if orient == 'H':
-                    # Thân giữa
                     canvas.create_rectangle(x0 + 10, y0, x1 - 10, y1, fill=color, outline="black", width=2)
-                    # Mui bo tròn trái (đầu)
                     canvas.create_arc(x0, y0, x0 + 20, y1, start=90, extent=180, fill=color, outline="black")
-                    # Mui bo tròn phải (đuôi)
                     canvas.create_arc(x1 - 20, y0, x1, y1, start=270, extent=180, fill=color, outline="black")
                 else:
-                    # Thân giữa
                     canvas.create_rectangle(x0, y0 + 10, x1, y1 - 10, fill=color, outline="black", width=2)
-                    # Mui trên
                     canvas.create_arc(x0, y0, x1, y0 + 20, start=180, extent=180, fill=color, outline="black")
-                    # Mui dưới
                     canvas.create_arc(x0, y1 - 20, x1, y1, start=0, extent=180, fill=color, outline="black")
             else:
-                # Xe dài (3 ô): không bo tròn, hình khối cứng
                 canvas.create_rectangle(x0, y0, x1, y1, fill=color, outline="black", width=2)
 
-            # Vẽ cửa kính
+            # Cửa sổ
             cx = (x0 + x1) // 2
             cy = (y0 + y1) // 2
             canvas.create_rectangle(cx - 10, cy - 10, cx + 10, cy + 10, fill="white", outline="black")
 
-            # Vẽ bánh xe
+            # Bánh xe
             if orient == 'H':
                 canvas.create_oval(x0 + 5, y1 - 10, x0 + 15, y1, fill="black")
                 canvas.create_oval(x1 - 15, y1 - 10, x1 - 5, y1, fill="black")
@@ -283,15 +288,42 @@ def draw_board():
                 canvas.create_oval(x0, y1 - 15, x0 + 10, y1 - 5, fill="black")
                 canvas.create_oval(x1 - 10, y1 - 15, x1, y1 - 5, fill="black")
 
-            # Vẽ tên xe
+            # Tên xe
             canvas.create_text(cx, cy, text=name, font=("Arial", 20, "bold"))
+#             # key = f"{name}_{orient}"
+#             # img = images.get(key)
+#             # if img:
+#             #     canvas.create_image(x0, y0, anchor='nw', image=img)
+#             # else:
+#             #   # fallback nếu không có ảnh
+#             #     canvas.create_rectangle(x0, y0, x1, y1, fill=color, outline="black", width=2)
+#             #     canvas.create_text((x0+x1)//2, (y0+y1)//2, text=name, font=("Arial", 20, "bold"))
 
-        total_cost = step_index
-        info_label.config(text=f"Step {step_index}/{len(solution)-1}    Total cost: {total_cost}")
-    else:
-        info_label.config(text="No solution found.")
+#             #     # Cửa sổ
+#             #     cx = (x0 + x1) // 2
+#             #     cy = (y0 + y1) // 2
+#             #     canvas.create_rectangle(cx - 10, cy - 10, cx + 10, cy + 10, fill="white", outline="black")
 
+#             #     # Bánh xe
+#             #     if orient == 'H':
+#             #         canvas.create_oval(x0 + 5, y1 - 10, x0 + 15, y1, fill="black")
+#             #         canvas.create_oval(x1 - 15, y1 - 10, x1 - 5, y1, fill="black")
+#             #     else:
+#             #         canvas.create_oval(x0, y1 - 15, x0 + 10, y1 - 5, fill="black")
+#             #         canvas.create_oval(x1 - 10, y1 - 15, x1, y1 - 5, fill="black")
 
+#             #     # Tên xe
+#             #     canvas.create_text(cx, cy, text=name, font=("Arial", 20, "bold"))
+
+#             # if has_solution:
+#             #     info_label.config(text=f"Step {step_index}/{len(solution)-1}    Total cost: {step_index}", fg="black")
+#             # else:
+#             #     info_label.config(text="🚫 No solution found.", fg="red")
+
+        if has_solution:
+            info_label.config(text=f"Step {step_index}/{len(solution)-1}    Total cost: {step_index}", fg="black")
+        else:
+            info_label.config(text="🚫 No solution found.", fg="red")
 
 def next_step():
     global step_index
@@ -314,6 +346,9 @@ def reset_step():
 
 def toggle_play():
     global is_playing
+    if not has_solution:
+        messagebox.showwarning("Không thể giải", " Bản đồ này không có lời giải!\nHãy bấm Reset để chọn bản đồ khác.")
+        return
     is_playing = not is_playing
     play_button.config(text="Pause" if is_playing else "Play")
     if is_playing:
@@ -331,7 +366,7 @@ def auto_step():
 # ===================== MAIN =====================
 
 root = tk.Tk()
-root.title("Rush Hour - BFS GUI (Random Maps)")
+root.title("Rush Hour - BFS GUI")
 
 canvas = tk.Canvas(root, width=CELL_SIZE * BOARD_SIZE, height=CELL_SIZE * BOARD_SIZE)
 canvas.pack()
@@ -348,6 +383,7 @@ play_button.pack(side=tk.LEFT, padx=5)
 tk.Button(btn_frame, text="Next >>", command=next_step).pack(side=tk.LEFT, padx=5)
 tk.Button(btn_frame, text="Reset", command=reset_step).pack(side=tk.LEFT, padx=5)
 
+# # images = load_images()  # Load ảnh PNG
 load_new_map()
 draw_board()
 root.mainloop()
