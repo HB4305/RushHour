@@ -4,8 +4,8 @@ from collections import deque
 import copy
 import random
 import heapq
-import time  # Add time module
-from PIL import Image, ImageTk  # Add PIL imports for background image
+import time  
+from PIL import Image, ImageTk  
 
 # ===================== LOGIC =====================
 
