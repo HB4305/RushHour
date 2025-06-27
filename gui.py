@@ -1,118 +1,10 @@
-# AI
 import tkinter as tk
-from tkinter import messagebox, simpledialog
-from collections import deque
-import copy
-import random
-import heapq
 import time  
 from PIL import Image, ImageTk  
+from tkinter import messagebox, simpledialog
 
-# ===================== LOGIC =====================
-
-def create_board(state):
-    board = [['.' for _ in range(6)] for _ in range(6)]
-    for name, (row, col, length, orient) in state.items():
-        for i in range(length):
-            r = row + i if orient == 'V' else row
-            c = col + i if orient == 'H' else col
-            board[r][c] = name
-    return board
-
-def state_key(state):
-    return tuple(sorted((k, v[0], v[1]) for k, v in state.items()))
-
-def is_goal(state):
-    row, col, length, orient = state['X']
-    if orient != 'H':
-        return False
-    end_col = col + length - 1
-    if end_col > 5:
-        return False
-    for c in range(end_col + 1, 6):
-        for name, (r, cc, l, o) in state.items():
-            if name == 'X': continue
-            for i in range(l):
-                rr = r + i if o == 'V' else r
-                rc = cc + i if o == 'H' else cc
-                if rr == row and rc == c:
-                    return False
-    return end_col == 5
-
-def generate_moves(state):
-    board = create_board(state)
-    next_states = []
-    for name, (row, col, length, orient) in state.items():
-        if orient == 'H':
-            if col > 0 and board[row][col - 1] == '.':
-                new_state = copy.deepcopy(state)
-                new_state[name] = (row, col - 1, length, orient)
-                next_states.append(new_state)
-            if col + length < 6 and board[row][col + length] == '.':
-                new_state = copy.deepcopy(state)
-                new_state[name] = (row, col + 1, length, orient)
-                next_states.append(new_state)
-        else:
-            if row > 0 and board[row - 1][col] == '.':
-                new_state = copy.deepcopy(state)
-                new_state[name] = (row - 1, col, length, orient)
-                next_states.append(new_state)
-            if row + length < 6 and board[row + length][col] == '.':
-                new_state = copy.deepcopy(state)
-                new_state[name] = (row + 1, col, length, orient)
-                next_states.append(new_state)
-    return next_states
-
-def bfs_solver(initial_state):
-    visited = set()
-    queue = deque()
-    queue.append((initial_state, []))
-    visited.add(state_key(initial_state))
-    while queue:
-        current_state, path = queue.popleft()
-        if is_goal(current_state):
-            return path + [current_state]
-        for next_state in generate_moves(current_state):
-            key = state_key(next_state)
-            if key not in visited:
-                visited.add(key)
-                queue.append((next_state, path + [current_state]))
-    return None
-
-def ucs_solver(initial_state):
-    visited = {}
-    heap = []
-    counter = 0  # Add counter to break ties
-    # (total_cost, counter, path, state)
-    heapq.heappush(heap, (0, counter, [], initial_state))
-    visited[state_key(initial_state)] = 0
-    counter += 1
-
-    while heap:
-        cost, _, path, current_state = heapq.heappop(heap)
-        if is_goal(current_state):
-            return path + [current_state]
-        for next_state in generate_moves(current_state):
-            # Find which vehicle moved and calculate cost
-            move_cost = 1  # Default cost
-            for name in current_state:
-                if current_state[name][:2] != next_state[name][:2]:
-                    vehicle_length = current_state[name][2]
-                    steps_moved = 1  # Each move is exactly 1 step
-                    move_cost = vehicle_length * steps_moved
-                    break
-            
-            next_cost = cost + move_cost
-            key = state_key(next_state)
-            if key not in visited or next_cost < visited[key]:
-                visited[key] = next_cost
-                heapq.heappush(heap, (next_cost, counter, path + [current_state], next_state))
-                counter += 1
-    return None
-
-
-# ===================== MAPS =====================
-
+from solver import *  # Import your solver functions
+# ===================== MAPS ====================
 maps = [
     {
         'X': (2, 0, 2, 'H'),
@@ -199,8 +91,6 @@ maps = [
         'X': (2, 0, 2, 'H'),
     }
 ]
-
-# ===================== GUI =====================
 
 CELL_SIZE = 100
 BOARD_SIZE = 6
@@ -706,8 +596,3 @@ def main():
     
     # Start the main loop
     root.mainloop()
-
-# ===================== MAIN =====================
-
-if __name__ == "__main__":
-    main()
