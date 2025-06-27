@@ -1,12 +1,17 @@
 import copy
 
 def create_board(state):
-    board = [['.' for _ in range(6)] for _ in range(6)]
-    for name, (row, col, length, orient) in state.items():
-        for i in range(length):
-            r = row + i if orient == 'V' else row
-            c = col + i if orient == 'H' else col
-            board[r][c] = name
+    board = [['.' for _ in range(6)] for _ in range(6)] # Tạo bảng 6x6
+    for name, (row, col, length, orient) in state.items(): # lấy trạng thái từng xe
+        for i in range(length): # đánh dấu từng ô thuộc xe
+            r = row + i if orient == 'V' else row # tăng theo chiều dọc
+            c = col + i if orient == 'H' else col #tăng theo chiều ngang
+            board[r][c] = name # Đánh dấu 1 ô của xe
+            # if orient == 'V':
+            #     board[row + i][col] = name # Đánh dấu 1 ô của xe
+            # else: # == 'H'
+            #     board[row][col + i] = name
+            
     return board
 
 def state_key(state):
