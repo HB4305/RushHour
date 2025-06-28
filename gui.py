@@ -130,6 +130,7 @@ def select_algorithm():
     algorithm_var = tk.StringVar(value="BFS")
     
     tk.Radiobutton(dialog, text="BFS (Breadth-First Search)", variable=algorithm_var, value="BFS", font=("Arial", 10)).pack(anchor="w", padx=20)
+    tk.Radiobutton(dialog, text="DFS (Depth-First Search)", variable=algorithm_var, value="DFS", font=("Arial", 10)).pack(anchor="w", padx=20)
     tk.Radiobutton(dialog, text="UCS (Uniform Cost Search)", variable=algorithm_var, value="UCS", font=("Arial", 10)).pack(anchor="w", padx=20)
     
     def confirm_selection():
@@ -218,6 +219,9 @@ def load_new_map():
     if selected_algorithm == "BFS":
         result = bfs_solver(initial_state)
         solution_costs = []  # BFS doesn't need cost tracking
+    elif selected_algorithm == "DFS":
+        result = dfs_solver(initial_state)
+        solution_costs = []  # DFS cũng không cần cost tracking
     else: # UCS
         result = ucs_solver(initial_state)
         if result:
@@ -438,7 +442,7 @@ def draw_board():
                 canvas.create_text(cx, cy, text=name, font=("Arial", 16, "bold"), fill="hotpink")
 
         if has_solution:
-            if selected_algorithm == "BFS":
+            if selected_algorithm in ["BFS", "DFS"]:
                 info_label.config(text=f"Step {step_index}    Total cost: {step_index}", fg="black")
             else: 
                 current_cost = solution_costs[step_index] if step_index < len(solution_costs) else 0

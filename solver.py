@@ -18,6 +18,23 @@ def bfs_solver(initial_state):
                 queue.append((next_state, path + [current_state]))
     return None
 
+def dfs_solver(initial_state):
+    visited = set()
+    stack = []
+    stack.append((initial_state, []))
+    visited.add(state_key(initial_state))
+
+    while stack:
+        current_state, path = stack.pop()
+        if is_goal(current_state):
+            return path + [current_state]
+        for next_state in generate_moves(current_state):
+            key = state_key(next_state)
+            if key not in visited:
+                visited.add(key)
+                stack.append((next_state, path + [current_state]))
+    return None
+
 def ucs_solver(initial_state):
     visited = {}
     heap = []
