@@ -15,7 +15,9 @@ def create_board(state):
     return board
 
 def state_key(state):
-    return tuple(sorted((k, v[0], v[1]) for k, v in state.items()))
+    return tuple(sorted((k, v[0], v[1]) for k, v in state.items())) 
+    # Chỉ lấy tên xe, hàng, cột là đủ thông tin
+    # ép về tuple để có thể hash (set, dict)
 
 def is_goal(state):
     row, col, length, orient = state['X']
@@ -24,14 +26,15 @@ def is_goal(state):
     end_col = col + length - 1
     if end_col > 5:
         return False
-    for c in range(end_col + 1, 6):
-        for name, (r, cc, l, o) in state.items():
-            if name == 'X': continue
-            for i in range(l):
-                rr = r + i if o == 'V' else r
-                rc = cc + i if o == 'H' else cc
-                if rr == row and rc == c:
-                    return False
+    #for c in range(end_col + 1, 6):
+    for name, (r, cc, l, o) in state.items():
+        if name == 'X': continue
+        for i in range(l):
+            rr = r + i if o == 'V' else r
+            rc = cc + i if o == 'H' else cc
+            #if rr == row and rc == c, muốn đổi tên biến c 
+            if rr == row and rc in range(end_col + 1, 6): # gọn hơn vì mỗi xe lặp 1 lần
+                return False
     return end_col == 5
 
 def generate_moves(state):
