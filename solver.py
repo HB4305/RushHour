@@ -28,9 +28,9 @@ def dfs_solver(initial_state):
         current_state, path = stack.pop()
         if is_goal(current_state):
             return path + [current_state]
-        for next_state in generate_moves(current_state):
+        for next_state in generate_moves(current_state): # Nạp tất cả trạng thái có thể tiếp theo
             key = state_key(next_state)
-            if key not in visited:
+            if key not in visited: # Chỉ thêm mới nếu chưa từng thăm
                 visited.add(key)
                 stack.append((next_state, path + [current_state]))
     return None
