@@ -6,7 +6,7 @@ from tkinter import messagebox, simpledialog
 from solver import *  # Import your solver functions
 # ===================== MAPS ====================
 maps = [
-    
+
     {
         'A': (0, 0, 2, 'V'),
         'B': (0, 1, 2, 'V'),
@@ -110,6 +110,7 @@ selected_algorithm = "BFS"
 solution_costs = []  # Store cumulative costs for UCS
 animation_start_time = 0  # Start time when animation begins
 current_animation_time = 0  # Current animation time
+current_map_index = 0 # Mark index map
 is_goal_reached = False  # Track if goal is reached
 final_time = 0  # Store final completion time
 
@@ -125,8 +126,9 @@ def select_algorithm():
     
     # Center the dialog
     dialog.transient(root)
+    root.iconbitmap("image/icon.ico")
     
-    tk.Label(dialog, text="Chọn thuật toán giải Rush Hour:", font=("Arial", 12)).pack(pady=10)
+    tk.Label(dialog, text="Chọn thuật toán giải Rush Hour:", font=("Arial", 14,"bold")).pack(pady=10)
     
     algorithm_var = tk.StringVar(value="BFS")
     
@@ -147,7 +149,7 @@ def select_algorithm():
     dialog.wait_window()
 
 def select_map():
-    global initial_state
+    global initial_state, current_map_index
     
     # Create map selection dialog
     dialog = tk.Toplevel()
@@ -158,6 +160,7 @@ def select_map():
     
     # Center the dialog
     dialog.transient(root)
+    root.iconbitmap("image/icon.ico")
     
     tk.Label(dialog, text="Chọn bản đồ Rush Hour:", font=("Arial", 11, "bold")).pack(pady=10)
     
@@ -182,8 +185,10 @@ def select_map():
     selected_map = None
     
     def confirm_selection():
+        global current_map_index
         nonlocal selected_map
         selection = map_var.get()
+        current_map_index = int(selection)
         selected_map = maps[int(selection)]
         dialog.destroy()
     
@@ -201,12 +206,13 @@ def select_map():
     return selected_map
 
 def load_new_map():
-    global initial_state, solution, step_index, has_solution, solution_costs, animation_start_time, current_animation_time, is_goal_reached, final_time
+    global initial_state, solution, step_index, has_solution, solution_costs, animation_start_time, current_animation_time, is_goal_reached, final_time, current_map_index, map_info_label
     
     # Get selected map
     selected_map = select_map()
     if selected_map:
         initial_state = selected_map
+        map_info_label.config(text=f"Map {current_map_index + 1}")
     else:
         # Fallback to first valid map
         initial_state = maps[0]
@@ -578,10 +584,12 @@ def main():
     """Main function to initialize and run the Rush Hour game"""
     global root, canvas, info_label, algorithm_label, time_label, play_button
     global background_image, car_images
+    global map_info_label
     
     # Create main window
     root = tk.Tk()
     root.title("Rush Hour - Algorithm Solver")
+    root.iconbitmap("image/icon.ico")
     
     # Show algorithm selection dialog on startup
     select_algorithm()
@@ -591,9 +599,14 @@ def main():
     car_images = load_car_images()
     
     # Create canvas
-    canvas = tk.Canvas(root, width=CELL_SIZE * BOARD_SIZE, height=CELL_SIZE * BOARD_SIZE)
+    canvas = tk.Canvas(root, width=CELL_SIZE * BOARD_SIZE, height=CELL_SIZE * BOARD_SIZE,
+                   bg="#f8f8f8", highlightthickness=2, highlightbackground="#aaa")
     canvas.pack()
     
+    # Map's Label
+    map_info_label = tk.Label(root, text=f"Map {current_map_index + 1}", font=("Arial", 10, "bold"), fg="purple")
+    map_info_label.pack()
+
     # Create info labels
     info_label = tk.Label(root, text="", font=("Arial", 12))
     info_label.pack()
@@ -603,16 +616,17 @@ def main():
     
     time_label = tk.Label(root, text="", font=("Arial", 10), fg="green")
     time_label.pack()
+
     
     # Create button frame
     btn_frame = tk.Frame(root)
     btn_frame.pack()
     
     # Create buttons
-    tk.Button(btn_frame, text="<< Prev", command=prev_step).pack(side=tk.LEFT, padx=5)
+    tk.Button(btn_frame, text="<< Prev", command=prev_step, font=("Arial", 10, "bold"), padx=10, pady=5, bg="#e0e0e0").pack(side=tk.LEFT, padx=5)
     play_button = tk.Button(btn_frame, text="Play", command=toggle_play)
     play_button.pack(side=tk.LEFT, padx=5)
-    tk.Button(btn_frame, text="Next >>", command=next_step).pack(side=tk.LEFT, padx=5)
+    tk.Button(btn_frame, text="Next >>", command=next_step, font=("Arial", 10, "bold"), padx=10, pady=5, bg="#e0e0e0").pack(side=tk.LEFT, padx=5)   
     tk.Button(btn_frame, text="Reset", command=reset_step).pack(side=tk.LEFT, padx=5)
     tk.Button(btn_frame, text="Quit", command=quit_program, bg="#f44336", fg="white").pack(side=tk.LEFT, padx=5)
     
