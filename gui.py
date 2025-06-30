@@ -625,7 +625,7 @@ def main():
     # Create buttons
     tk.Button(btn_frame, text="<< Prev", command=prev_step, font=("Arial", 10, "bold"), padx=10, pady=5, bg="#e0e0e0").pack(side=tk.LEFT, padx=5)
     play_button = tk.Button(btn_frame, text="Play", command=toggle_play)
-    play_button.pack(side=tk.LEFT, padx=5)
+    tk.Button(btn_frame, text="▶ Play", command=toggle_play, font=("Arial", 10, "bold"), padx=14, pady=6, bg="#4CAF50", fg="white").pack(side=tk.LEFT, padx=5)
     tk.Button(btn_frame, text="Next >>", command=next_step, font=("Arial", 10, "bold"), padx=10, pady=5, bg="#e0e0e0").pack(side=tk.LEFT, padx=5)   
     tk.Button(btn_frame, text="Reset", command=reset_step).pack(side=tk.LEFT, padx=5)
     tk.Button(btn_frame, text="Quit", command=quit_program, bg="#f44336", fg="white").pack(side=tk.LEFT, padx=5)
