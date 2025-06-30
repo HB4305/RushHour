@@ -107,7 +107,7 @@ def a_star_solver(initial_state):
     initial_h = heuristic(initial_state)
     heappush(open_set, (initial_h, counter, 0, initial_state, [initial_state]))
     counter += 1
-
+    
     visited = {}
     visited[state_key(initial_state)] = 0
 
