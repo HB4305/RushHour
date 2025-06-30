@@ -104,7 +104,7 @@ def heuristic(state):
                 free_space_right = 5 - (cl + l - 1)
                 
                 if free_space_left == 0 or free_space_right == 0:
-                    blocking_cost += 10  # Very blocked 
+                    blocking_cost += 10  # Need more times to moves
                 else:
                     blocking_cost += 5  # Can move either side
                 break
