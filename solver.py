@@ -67,7 +67,6 @@ def ucs_solver(initial_state):
     return None
 
 def heuristic(state):
-    """Improved heuristic function for A*"""
     if 'X' not in state:
         return float('inf')
     
