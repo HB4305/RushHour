@@ -67,34 +67,50 @@ def ucs_solver(initial_state):
     return None
 
 def heuristic(state):
-    """Heuristic function for A* - estimates distance to goal"""
+    """Improved heuristic function for A*"""
     if 'X' not in state:
         return float('inf')
     
-    # red car position
     row, col, length, orient = state['X']
     
-    if orient == 'H':
-        # For horizontal car, distance is number of blocks to exit (column 5)
-        distance = (5 - (col + length - 1))
-        
-        # Check if path to exit is blocked
-        blocking_cars = 0
-        exit_row = row
-        for c in range(col + length, 6):
-            for name, (r, cl, l, o) in state.items():
-                if o == 'V' and cl == c and r <= exit_row < r + l:
-                    blocking_cars += l * 2
-                    break
-                elif o == 'H' and r == exit_row and cl <= c < cl + l:
-                    blocking_cars += 3
-                    break
-        
-        # Heuristic is distance + number of blocking cars
-        return distance + blocking_cars
-    else:
-        # Vertical car can't exit
+    if orient != 'H':  # Only horizontal cars can exit
         return float('inf')
+    
+    exit_distance = (5 - (col + length - 1))
+    if exit_distance == 0:  # Already solved
+        return 0
+    
+    blocking_cost = 0
+    exit_path = range(col + length, 6)
+    
+    for c in exit_path:
+        for name, (r, cl, l, o) in state.items():
+            if name == 'X':
+                continue
+                
+            # Vertical blocking car
+            if o == 'V' and cl == c and r <= row < r + l:
+                # Cost depends on how far the blocking car can move
+                free_space_above = r  # Space to move up
+                free_space_below = 5 - (r + l - 1)  # Space to move down
+                min_moves_to_free = min(free_space_above, free_space_below) + 1
+                blocking_cost += l * min_moves_to_free  # Longer cars need more moves
+                break
+                
+            # Horizontal blocking car 
+            elif o == 'H' and r == row and cl <= c < cl + l:
+                
+                free_space_left = cl
+                free_space_right = 5 - (cl + l - 1)
+                
+                if free_space_left == 0 or free_space_right == 0:
+                    blocking_cost += 10  # Very blocked 
+                else:
+                    blocking_cost += 5  # Can move either side
+                break
+    
+    
+    return exit_distance + blocking_cost + (exit_distance * 0.1)
 
 def a_star_solver(initial_state):
     from heapq import heappush, heappop
