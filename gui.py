@@ -90,7 +90,7 @@ maps = [
     },
     {
         'X': (2, 0, 2, 'H'),
-    }
+    },
 ]
 
 CELL_SIZE = 100
@@ -119,7 +119,7 @@ def select_algorithm():
     # Create algorithm selection dialog
     dialog = tk.Toplevel()
     dialog.title("Chọn thuật toán")
-    dialog.geometry("300x150")
+    dialog.geometry("350x220")
     dialog.resizable(False, False)
     dialog.grab_set()  # Make dialog modal
     
@@ -131,9 +131,10 @@ def select_algorithm():
     algorithm_var = tk.StringVar(value="BFS")
     
     tk.Radiobutton(dialog, text="BFS (Breadth-First Search)", variable=algorithm_var, value="BFS", font=("Arial", 10)).pack(anchor="w", padx=20)
-    tk.Radiobutton(dialog, text="DFS (Depth-First Search)", variable=algorithm_var, value="DFS", font=("Arial", 10)).pack(anchor="w", padx=20)
-    tk.Radiobutton(dialog, text="UCS (Uniform Cost Search)", variable=algorithm_var, value="UCS", font=("Arial", 10)).pack(anchor="w", padx=20)
-    
+    tk.Radiobutton(dialog, text="DFS (Depth-First Search)  ", variable=algorithm_var, value="DFS", font=("Arial", 10)).pack(anchor="w", padx=20)
+    tk.Radiobutton(dialog, text="UCS (Uniform Cost Search) ", variable=algorithm_var, value="UCS", font=("Arial", 10)).pack(anchor="w", padx=20)
+    tk.Radiobutton(dialog, text="A*  (A-Star Search)       ", variable=algorithm_var, value="A*", font=("Arial", 10)).pack(anchor="w", padx=20)
+
     def confirm_selection():
         global selected_algorithm
         selected_algorithm = algorithm_var.get()
@@ -151,7 +152,7 @@ def select_map():
     # Create map selection dialog
     dialog = tk.Toplevel()
     dialog.title("Chọn bản đồ")
-    dialog.geometry("400x400")
+    dialog.geometry("500x500")
     dialog.resizable(False, False)
     dialog.grab_set()  # Make dialog modal
     
@@ -222,11 +223,29 @@ def load_new_map():
         solution_costs = []  # BFS doesn't need cost tracking
     elif selected_algorithm == "DFS":
         result = dfs_solver(initial_state)
-        solution_costs = []  # DFS cũng không cần cost tracking
-    else: # UCS
+        solution_costs = []  # DFS doesn't need cost tracking
+    elif selected_algorithm == "UCS":
         result = ucs_solver(initial_state)
         if result:
-            # Calculate cumulative costs for UCS display
+            # Calculate cumulative costs for UCS
+            solution_costs = [0]  # Initial state has cost 0
+            for i in range(1, len(result)):
+                prev_state = result[i-1]
+                curr_state = result[i]
+                # Find which vehicle moved and calculate cost
+                move_cost = 1  # Default
+                for name in prev_state:
+                    if prev_state[name][:2] != curr_state[name][:2]:
+                        vehicle_length = prev_state[name][2]
+                        move_cost = vehicle_length * 1  # length * 1 step
+                        break
+                solution_costs.append(solution_costs[-1] + move_cost)
+        else:
+            solution_costs = []
+    elif selected_algorithm == "A*":
+        result = a_star_solver(initial_state)
+        if result:
+            # Calculate cumulative costs for A* (same method as UCS)
             solution_costs = [0]  # Initial state has cost 0
             for i in range(1, len(result)):
                 prev_state = result[i-1]
@@ -546,6 +565,8 @@ def auto_step():
     else:
         is_playing = False
         play_button.config(text="Play")
+
+
 
 def quit_program():
     import sys
