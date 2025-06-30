@@ -6,6 +6,7 @@ from tkinter import messagebox, simpledialog
 from solver import *  # Import your solver functions
 # ===================== MAPS ====================
 maps = [
+    
     {
         'A': (0, 0, 2, 'V'),
         'B': (0, 1, 2, 'V'),

@@ -102,6 +102,7 @@ def a_star_solver(initial_state):
     if is_goal(initial_state):
         return [initial_state]
 
+
     counter = 0
     open_set = []
     initial_h = heuristic(initial_state)
