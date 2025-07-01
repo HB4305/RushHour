@@ -222,6 +222,9 @@ def load_new_map():
     current_animation_time = 0
     is_goal_reached = False
     final_time = 0
+
+    # Calculate time based on only algorithm
+    start_time = time.time()
     
     # Use selected algorithm
     if selected_algorithm == "BFS":
@@ -267,6 +270,13 @@ def load_new_map():
         else:
             solution_costs = []
     
+    # Kết thúc đo thời gian
+    end_time = time.time()
+    elapsed = end_time - start_time
+
+    # In thời gian ra terminal
+    print(f"⏱️ {selected_algorithm} solver chạy mất {elapsed:.4f} giây")
+
     if result is None:
         solution = [initial_state]
         has_solution = False
