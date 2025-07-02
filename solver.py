@@ -21,7 +21,7 @@ def bfs_solver(initial_state):
             if key not in visited:
                 visited.add(key)
                 queue.append((next_state, path + [current_state]))
-    return None
+    return None, expanded_nodes
 
 def dfs_solver(initial_state):
     visited = set()
@@ -42,7 +42,7 @@ def dfs_solver(initial_state):
             if key not in visited: # Chỉ thêm mới nếu chưa từng thăm
                 visited.add(key)
                 stack.append((next_state, path + [current_state]))
-    return None
+    return None, expanded_nodes
 
 def ucs_solver(initial_state):
     visited = {}
@@ -76,7 +76,7 @@ def ucs_solver(initial_state):
                 visited[key] = next_cost
                 heapq.heappush(heap, (next_cost, counter, path + [current_state], next_state))
                 counter += 1
-    return None
+    return None, expanded_nodes
 
 def heuristic(state):
     if 'X' not in state:
@@ -165,5 +165,5 @@ def a_star_solver(initial_state):
                 heappush(open_set, (f_score, counter, new_g_score, next_state, path + [next_state]))
                 counter += 1
 
-    return None
+    return None, expanded_nodes
 
