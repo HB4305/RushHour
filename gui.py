@@ -1,5 +1,6 @@
 import tkinter as tk
 import time  
+import tracemalloc
 from PIL import Image, ImageTk  
 from tkinter import messagebox, simpledialog
 
@@ -8,14 +9,15 @@ from solver import *  # Import your solver functions
 maps = [
 
     {
-        'A': (0, 0, 2, 'V'),
-        'B': (0, 1, 2, 'V'),
+        # Intentionally put X at the bottom for DFS running faster
+        'A': (3, 4, 2, 'H'),
+        'B': (3, 2, 2, 'V'),
         'C': (0, 4, 3, 'V'),
-        'X': (2, 0, 2, 'H') #,
-        # 'D': (1, 5, 2, 'V'),
-        # 'E': (3, 0, 3, 'H'),
-        # 'F': (4, 3, 2, 'H'),
-        # 'G': (5, 4, 2, 'H')
+        'X': (2, 0, 2, 'H')
+        # 'A': (0, 0, 2, 'V'),
+        # 'B': (0, 1, 2, 'V'),
+        # 'C': (0, 4, 3, 'V'),
+        # 'X': (2, 0, 2, 'H')
     },
     {
         'X': (2, 1, 2, 'H'),
@@ -27,13 +29,14 @@ maps = [
         'F': (5, 0, 2, 'H')
     },
     {
+        # There is a difference but the idea is based on level 7 map of https://www.cokogames.com/rush-hour/play/
         'X': (2, 2, 2, 'H'),
-        'A': (0, 0, 2, 'V'),
-        'B': (0, 1, 2, 'V'),
-        'C': (0, 3, 2, 'V'),
-        'D': (1, 5, 2, 'V'),
-        'E': (3, 0, 2, 'H'),
-        'F': (4, 2, 3, 'H')
+        'A': (1, 2, 2, 'H'),
+        'B': (0, 4, 2, 'V'),
+        'C': (2, 4, 2, 'V'),
+        'D': (4, 4, 2, 'H'),
+        'E': (4, 3, 2, 'V'),
+        'F': (0, 5, 3, 'V')
     },
     {
         'X': (2, 1, 2, 'H'),
@@ -225,16 +228,19 @@ def load_new_map():
 
     # Calculate time based on only algorithm
     start_time = time.time()
+    tracemalloc.start()  # Start memory tracking
+
+    expanded_nodes = 0  # Track number of expanded nodes
     
     # Use selected algorithm
     if selected_algorithm == "BFS":
-        result = bfs_solver(initial_state)
+        result, expanded_nodes = bfs_solver(initial_state)
         solution_costs = []  # BFS doesn't need cost tracking
     elif selected_algorithm == "DFS":
-        result = dfs_solver(initial_state)
+        result, expanded_nodes = dfs_solver(initial_state)
         solution_costs = []  # DFS doesn't need cost tracking
     elif selected_algorithm == "UCS":
-        result = ucs_solver(initial_state)
+        result, expanded_nodes = ucs_solver(initial_state)
         if result:
             # Calculate cumulative costs for UCS
             solution_costs = [0]  # Initial state has cost 0
@@ -252,7 +258,7 @@ def load_new_map():
         else:
             solution_costs = []
     elif selected_algorithm == "A*":
-        result = a_star_solver(initial_state)
+        result, expanded_nodes = a_star_solver(initial_state)
         if result:
             # Calculate cumulative costs for A* (same method as UCS)
             solution_costs = [0]  # Initial state has cost 0
@@ -269,13 +275,18 @@ def load_new_map():
                 solution_costs.append(solution_costs[-1] + move_cost)
         else:
             solution_costs = []
-    
+
     # Kết thúc đo thời gian
     end_time = time.time()
     elapsed = end_time - start_time
+    _, peak = tracemalloc.get_traced_memory()
+    tracemalloc.stop()
+    tracemalloc.clear_traces()
 
     # In thời gian ra terminal
-    print(f"⏱️ {selected_algorithm} solver chạy mất {elapsed:.4f} giây")
+    print(f"⏱️  {selected_algorithm} solver chạy mất {elapsed:.4f} giây")
+    print(f"📦 Peak memory usage: {peak / 1024:.2f} KB")
+    print(f"🌳 Expanded nodes: {expanded_nodes}")
 
     if result is None:
         solution = [initial_state]

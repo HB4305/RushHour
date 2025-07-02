@@ -7,10 +7,15 @@ def bfs_solver(initial_state):
     queue = deque()
     queue.append((initial_state, []))
     visited.add(state_key(initial_state))
+
+    expanded_nodes = 0
+
     while queue:
         current_state, path = queue.popleft()
+        expanded_nodes += 1
+
         if is_goal(current_state):
-            return path + [current_state]
+            return path + [current_state], expanded_nodes
         for next_state in generate_moves(current_state):
             key = state_key(next_state)
             if key not in visited:
@@ -24,10 +29,14 @@ def dfs_solver(initial_state):
     stack.append((initial_state, []))
     visited.add(state_key(initial_state))
 
+    expanded_nodes = 0
+
     while stack:
         current_state, path = stack.pop()
+        expanded_nodes += 1
+
         if is_goal(current_state):
-            return path + [current_state]
+            return path + [current_state], expanded_nodes
         for next_state in generate_moves(current_state): # Nạp tất cả trạng thái có thể tiếp theo
             key = state_key(next_state)
             if key not in visited: # Chỉ thêm mới nếu chưa từng thăm
@@ -44,10 +53,13 @@ def ucs_solver(initial_state):
     visited[state_key(initial_state)] = 0
     counter += 1
 
+    expanded_nodes = 0
+
     while heap:
         cost, _, path, current_state = heapq.heappop(heap)
+        expanded_nodes += 1
         if is_goal(current_state):
-            return path + [current_state]
+            return path + [current_state], expanded_nodes
         for next_state in generate_moves(current_state):
             # Find which vehicle moved and calculate cost
             move_cost = 1  # Default cost
@@ -127,11 +139,14 @@ def a_star_solver(initial_state):
     visited = {}
     visited[state_key(initial_state)] = 0
 
+    expanded_nodes = 0
+
     while open_set:
         _, _, g_score, current_state, path = heappop(open_set)
+        expanded_nodes += 1
 
         if is_goal(current_state):
-            return path
+            return path, expanded_nodes
 
         for next_state in generate_moves(current_state):
             key = state_key(next_state)
