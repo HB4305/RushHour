@@ -9,24 +9,17 @@ from solver import *  # Import your solver functions
 maps = [
 
     {
+        'X': (2, 0, 2, 'H'),
+        'A': (0, 0, 2, 'V'),
+        'B': (0, 1, 2, 'V'),
+        'C': (0, 4, 3, 'V')
+    },
+    {
         # Intentionally put X at the bottom for DFS running faster
         'A': (3, 4, 2, 'H'),
         'B': (3, 2, 2, 'V'),
         'C': (0, 4, 3, 'V'),
         'X': (2, 0, 2, 'H')
-        # 'A': (0, 0, 2, 'V'),
-        # 'B': (0, 1, 2, 'V'),
-        # 'C': (0, 4, 3, 'V'),
-        # 'X': (2, 0, 2, 'H')
-    },
-    {
-        'X': (2, 1, 2, 'H'),
-        'A': (0, 0, 3, 'V'),
-        'B': (0, 3, 2, 'V'),
-        'C': (1, 5, 2, 'V'),
-        'D': (3, 0, 3, 'H'),
-        'E': (4, 2, 2, 'H'),
-        'F': (5, 0, 2, 'H')
     },
     {
         # There is a difference but the idea is based on level 7 map of https://www.cokogames.com/rush-hour/play/
