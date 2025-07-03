@@ -5,7 +5,7 @@ from PIL import Image, ImageTk
 from tkinter import messagebox, simpledialog
 
 from solver import *  # Import your solver functions
-# ===================== MAPS ====================
+# ===================== MAPS ===================
 maps = [
 
     {
