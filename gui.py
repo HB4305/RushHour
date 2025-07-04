@@ -114,7 +114,7 @@ def select_algorithm():
     
     # Create algorithm selection dialog
     dialog = tk.Toplevel()
-    dialog.title("Chọn thuật toán")
+    dialog.title("Select Algorithm")
     dialog.geometry("350x220")
     dialog.resizable(False, False)
     dialog.grab_set()  # Make dialog modal
@@ -123,7 +123,7 @@ def select_algorithm():
     dialog.transient(root)
     root.iconbitmap("image/icon.ico")
     
-    tk.Label(dialog, text="Chọn thuật toán giải Rush Hour:", font=("Arial", 14,"bold")).pack(pady=10)
+    tk.Label(dialog, text="Select Algorithm Rush Hour", font=("Arial", 14,"bold")).pack(pady=10)
     
     algorithm_var = tk.StringVar(value="BFS")
     
@@ -137,7 +137,7 @@ def select_algorithm():
         selected_algorithm = algorithm_var.get()
         dialog.destroy()
     
-    tk.Button(dialog, text="Xác nhận", command=confirm_selection, 
+    tk.Button(dialog, text="Confirm", command=confirm_selection, 
               font=("Arial", 11, "bold"), bg="#FF44FF", fg="white", padx=30).pack(pady=10)
     
     # Wait for dialog to close
@@ -148,7 +148,7 @@ def select_map():
     
     # Create map selection dialog
     dialog = tk.Toplevel()
-    dialog.title("Chọn bản đồ")
+    dialog.title("Select Map")
     dialog.geometry("500x500")
     dialog.resizable(False, False)
     dialog.grab_set()  # Make dialog modal
@@ -157,7 +157,7 @@ def select_map():
     dialog.transient(root)
     root.iconbitmap("image/icon.ico")
     
-    tk.Label(dialog, text="Chọn bản đồ Rush Hour:", font=("Arial", 11, "bold")).pack(pady=10)
+    tk.Label(dialog, text="Select Map Rush Hour", font=("Arial", 14, "bold")).pack(pady=10)
     
     # Create a frame for map selection with scrollbar
     frame = tk.Frame(dialog)
@@ -172,7 +172,7 @@ def select_map():
         truck_count = sum(1 for v in map_data.values() if v[2] == 3)  # Count vehicles with length 3
         car_count = vehicle_count - truck_count - 1  # Subtract trucks and red car X
         
-        description = f"Bản đồ {i+1}"
+        description = f"Map {i+1}"
         
         tk.Radiobutton(frame, text=description, variable=map_var, value=str(i), 
                       font=("Arial", 9), anchor="w").pack(anchor="w", pady=2)
@@ -192,7 +192,7 @@ def select_map():
     btn_frame = tk.Frame(dialog)
     btn_frame.pack(pady=10)
     
-    tk.Button(btn_frame, text="Xác nhận", command=confirm_selection, 
+    tk.Button(btn_frame, text="Confirm", command=confirm_selection, 
               font=("Arial", 10, "bold"), bg="#FF44FF", fg="white", padx=30).pack(side=tk.LEFT, padx=10)
     
     # Wait for dialog to close
@@ -486,21 +486,19 @@ def draw_board():
             else: 
                 current_cost = solution_costs[step_index] if step_index < len(solution_costs) else 0
                 info_label.config(text=f"Step {step_index}    Total cost: {current_cost}", fg="black")
-            algorithm_label.config(text=f"Thuật toán: {selected_algorithm}")
+            algorithm_label.config(text=f"Algorithm: {selected_algorithm}")
             
-            # Update time display with smooth animation
+            # Update time display - removed pause state
             if is_goal_reached:
-                time_label.config(text=f"🎉 HOÀN THÀNH! Thời gian: {final_time:.2f}s", fg="green")
-            elif is_playing and animation_start_time > 0:
-                time_label.config(text=f"⏱️ Đang chạy: {current_animation_time:.2f}s", fg="blue")
-            elif animation_start_time > 0:  # Paused but has started
-                time_label.config(text=f"⏸️ Tạm dừng: {current_animation_time:.2f}s", fg="orange")
+                time_label.config(text=f"🎉 Win! Time: {final_time:.2f}s", fg="green")
+            elif animation_start_time > 0:  # Show time when animation has started
+                time_label.config(text=f"⏱️ Time: {current_animation_time:.2f}s", fg="blue")
             else:
                 time_label.config(text="", fg="green")
         else:
             info_label.config(text="🚫 No solution found.", fg="red")
-            algorithm_label.config(text=f"Thuật toán: {selected_algorithm} - Không có lời giải")
-            time_label.config(text="Không có lời giải", fg="red")
+            algorithm_label.config(text=f"Algorithm: {selected_algorithm} - No solution")
+            time_label.config(text="No solution", fg="red")
 
 def next_step():
     global step_index, is_goal_reached, final_time, is_playing
@@ -546,9 +544,9 @@ def toggle_play():
         return
     
     is_playing = not is_playing
-    play_button.config(text="Pause" if is_playing else "Play")
     
     if is_playing:
+        play_button.config(text="Pause")
         if step_index == 0 and not is_goal_reached:  # Starting animation
             animation_start_time = time.time()
             current_animation_time = 0
@@ -558,8 +556,9 @@ def toggle_play():
         update_timer()  # Start smooth timer
         auto_step()
     else:
+        play_button.config(text="Play")
         # Paused - keep current time but stop auto-stepping
-        draw_board()  # Update display to show paused state
+        draw_board()  # Update display to show current state
 
 def auto_step():
     global is_playing, is_goal_reached, final_time
@@ -637,8 +636,8 @@ def main():
     
     # Create buttons
     tk.Button(btn_frame, text="<< Prev", command=prev_step, font=("Arial", 10, "bold"), padx=10, pady=5, bg="#e0e0e0").pack(side=tk.LEFT, padx=5)
-    play_button = tk.Button(btn_frame, text="Play", command=toggle_play)
-    tk.Button(btn_frame, text="▶ Play", command=toggle_play, font=("Arial", 10, "bold"), padx=14, pady=6, bg="#4CAF50", fg="white").pack(side=tk.LEFT, padx=5)
+    play_button = tk.Button(btn_frame, text="▶ Play", command=toggle_play, font=("Arial", 10, "bold"), padx=14, pady=6, bg="#4CAF50", fg="white")
+    play_button.pack(side=tk.LEFT, padx=5)
     tk.Button(btn_frame, text="Next >>", command=next_step, font=("Arial", 10, "bold"), padx=10, pady=5, bg="#e0e0e0").pack(side=tk.LEFT, padx=5)   
     tk.Button(btn_frame, text="Reset", command=reset_step).pack(side=tk.LEFT, padx=5)
     tk.Button(btn_frame, text="Quit", command=quit_program, bg="#f44336", fg="white").pack(side=tk.LEFT, padx=5)
