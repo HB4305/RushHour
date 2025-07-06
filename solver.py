@@ -37,9 +37,9 @@ def dfs_solver(initial_state):
 
         if is_goal(current_state):
             return path + [current_state], expanded_nodes
-        for next_state in generate_moves(current_state): # Nạp tất cả trạng thái có thể tiếp theo
+        for next_state in generate_moves(current_state): # Get all possible next states
             key = state_key(next_state)
-            if key not in visited: # Chỉ thêm mới nếu chưa từng thăm
+            if key not in visited: # Only add if not visited
                 visited.add(key)
                 stack.append((next_state, path + [current_state]))
     return None, expanded_nodes

@@ -1,23 +1,18 @@
 import copy
 
 def create_board(state):
-    board = [['.' for _ in range(6)] for _ in range(6)] # Tạo bảng 6x6
-    for name, (row, col, length, orient) in state.items(): # lấy trạng thái từng xe
-        for i in range(length): # đánh dấu từng ô thuộc xe
-            r = row + i if orient == 'V' else row # tăng theo chiều dọc
-            c = col + i if orient == 'H' else col #tăng theo chiều ngang
-            board[r][c] = name # Đánh dấu 1 ô của xe
-            # if orient == 'V':
-            #     board[row + i][col] = name # Đánh dấu 1 ô của xe
-            # else: # == 'H'
-            #     board[row][col + i] = name
-            
+    board = [['.' for _ in range(6)] for _ in range(6)] # Create a 6x6 board filled with '.'
+    for name, (row, col, length, orient) in state.items(): # Get information of each car
+        for i in range(length): # Mark each cell occupied by the car
+            r = row + i if orient == 'V' else row # Increase row for vertical cars
+            c = col + i if orient == 'H' else col # Increase column for horizontal cars
+            board[r][c] = name # Mark the cell with the car's name
     return board
 
 def state_key(state):
     return tuple(sorted((k, v[0], v[1]) for k, v in state.items())) 
-    # Chỉ lấy tên xe, hàng, cột là đủ thông tin
-    # ép về tuple để có thể hash (set, dict)
+    # Only keep the name, the position (row, col) of each car
+    # Typecast to tuple for immutability and sorting for consistent order
 
 def is_goal(state):
     row, col, length, orient = state['X']
@@ -26,14 +21,14 @@ def is_goal(state):
     end_col = col + length - 1
     if end_col > 5:
         return False
-    #for c in range(end_col + 1, 6):
-    for name, (r, cc, l, o) in state.items():
+    
+# Check if the exit is clear
+    for name, (r, c, l, o) in state.items():
         if name == 'X': continue
         for i in range(l):
             rr = r + i if o == 'V' else r
-            rc = cc + i if o == 'H' else cc
-            #if rr == row and rc == c, muốn đổi tên biến c 
-            if rr == row and rc in range(end_col + 1, 6): # gọn hơn vì mỗi xe lặp 1 lần
+            cc = c + i if o == 'H' else c 
+            if rr == row and cc in range(end_col + 1, 6): # If any other car blocks the exit
                 return False
     return end_col == 5
 
