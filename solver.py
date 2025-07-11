@@ -48,7 +48,6 @@ def ucs_solver(initial_state):
     visited = {}
     heap = []
     counter = 0  # Add counter to break ties
-    # (total_cost, counter, path, state)
     heapq.heappush(heap, (0, counter, [], initial_state))
     visited[state_key(initial_state)] = 0
     counter += 1
