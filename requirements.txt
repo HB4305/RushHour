@@ -1,0 +1,10 @@
+- import copy: Used to create a deep copy of the state in the generate_moves function via copy.deepcopy(state)
+- from collections import deque: Use a double-ended queue (deque) in the BFS algorithm to increase performance when adding/removing elements at the beginning of the list.
+- import heapq: Used to create a priority queue in the UCS and A* algorithms (heappush, heappop).
+- from logic import *: Import all functions/variables from the logic.py file
+- import tkinter as tk: Create a graphical user interface (GUI) with Python.
+- import time: Measure algorithm time and calculate running time in animations.
+- import tracemalloc: Track memory usage during algorithm execution.
+- from solver import *: Import algorithm functions from solver.py file such as bfs_solver, dfs_solver, ucs_solver, a_star_solver
+- from PIL import Image, ImageTk : (From Pillow) to process and display background images and images of cars.
+- from tkinter import messagebox, simpledialog: Easily call message boxes, receive input from users via popup (simpledialog)
